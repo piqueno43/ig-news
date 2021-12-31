@@ -7,13 +7,13 @@ import { stripe } from "../../services/stripe";
 type User = {
   ref: {
     id: string;
-  }
+  },
   data: {
     stripe_customer_id: string;
   }
 }
 
-export default async (request: NextApiRequest, response: NextApiResponse) => {
+async function subscribe(request: NextApiRequest, response: NextApiResponse) {
   if (request.method === 'POST') {
     const session = await getSession({ req: request });
 
@@ -21,7 +21,7 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
       q.Get(
         q.Match(
           q.Index('users_by_email'),
-          q.Casefold(session.user.email)
+          q.Casefold(session?.user?.email ?? '')
         )
       )
     );
@@ -54,7 +54,7 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
       payment_method_types: ['card'],
       billing_address_collection: 'required',
       line_items: [
-        { price: 'price_1JphM9EBX2rZTHVjevZQy4sU', quantity: 1 }
+        { price: 'price_1KCqQ4EBX2rZTHVjGPp5UNLb', quantity: 1 }
       ],
       mode: 'subscription',
       allow_promotion_codes: true,
@@ -68,3 +68,5 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
     response.status(405).send('Method not allowed');
   }
 }
+
+export default subscribe
