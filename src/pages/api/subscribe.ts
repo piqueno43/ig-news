@@ -7,21 +7,21 @@ import { stripe } from "../../services/stripe";
 type User = {
   ref: {
     id: string;
-  },
+  }
   data: {
     stripe_customer_id: string;
   }
 }
 
-async function subscribe(request: NextApiRequest, response: NextApiResponse) {
+export default async (request: NextApiRequest, response: NextApiResponse) => {
   if (request.method === 'POST') {
     const session = await getSession({ req: request });
 
     const user = await fauna.query<User>(
       q.Get(
         q.Match(
-          q.Index('users_by_email'),
-          q.Casefold(session?.user?.email ?? '')
+          q.Index('user_by_email'),
+          q.Casefold(session.user.email)
         )
       )
     );
@@ -30,7 +30,7 @@ async function subscribe(request: NextApiRequest, response: NextApiResponse) {
 
     if (!customerId) {
       const stripeCustomer = await stripe.customers.create({
-        email: session?.user?.email as string,
+        email: session.user.email,
       });
 
       await fauna.query(
@@ -58,8 +58,8 @@ async function subscribe(request: NextApiRequest, response: NextApiResponse) {
       ],
       mode: 'subscription',
       allow_promotion_codes: true,
-      success_url: `${process.env.STRIPE_SUCCESS_URL}`,
-      cancel_url: `${process.env.STRIPE_CANCEL_URL}`,
+      success_url: process.env.STRIPE_SUCCESS_URL,
+      cancel_url: process.env.STRIPE_CANCEL_URL,
     });
 
     return response.status(200).json({ sessionId: stripeCheckoutSession.id });
@@ -68,5 +68,3 @@ async function subscribe(request: NextApiRequest, response: NextApiResponse) {
     response.status(405).send('Method not allowed');
   }
 }
-
-export default subscribe;
