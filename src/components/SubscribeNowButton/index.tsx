@@ -4,11 +4,7 @@ import { api } from '../../services/api';
 import { getStripeJs } from '../../services/stripe-js';
 import styles from './styles.module.scss';
 
-interface SubscribeNowButtonProps {
-  priceId: string;
-}
-
-export function SubscribeNowButton({ priceId }: SubscribeNowButtonProps) {
+export function SubscribeNowButton() {
   const [ session ] = useSession();
   const router = useRouter();
 
@@ -19,7 +15,7 @@ export function SubscribeNowButton({ priceId }: SubscribeNowButtonProps) {
       return;
     }
 
-    if(session.activeSuscription) {
+    if(session.activeSubscription) {
       router.push('/posts');
 
       return;

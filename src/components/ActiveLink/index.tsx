@@ -6,9 +6,9 @@ import Link, { LinkProps } from "next/link";
 
 interface ActiveLinkProps extends LinkProps{  
   children: ReactElement;
-  
+  activeClassName: string;
 }
-export function ActiveLink({children, ...props}: ActiveLinkProps) {
+export function ActiveLink({children, activeClassName, ...props}: ActiveLinkProps) {
   const { asPath } = useRouter();
   const child = Children.only(children);
   const childClassName = child.props.className || '';
@@ -17,7 +17,7 @@ export function ActiveLink({children, ...props}: ActiveLinkProps) {
     asPath === props.href 
     || asPath === props.as
     || props.passHref && asPath.startsWith('/posts')
-      ? `${childClassName} active-menu`.trim()
+      ? `${childClassName} ${activeClassName} active-menu`.trim()
       : childClassName;
   
   return (
